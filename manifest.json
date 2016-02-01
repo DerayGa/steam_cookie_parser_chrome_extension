@@ -17,8 +17,8 @@
     "default_popup": "steam.html"
   },
   "permissions": [
+    "*://*.steamcommunity.com/",
     "cookies",
-    "*://*.steamcommunity.com",
-    "*://steamcommunity.com"
+    "clipboardWrite"
   ]
 }

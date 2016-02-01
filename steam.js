@@ -1,19 +1,37 @@
+var id, login, cookie;
+
 function getCookies(domain, name, callback) {
     chrome.cookies.get({"url": domain, "name": name}, function(cookie) {
         if(callback) {
-            callback(cookie);
+            callback(cookie.value);
         }
     });
 }
 
+function showContent(){
+	if(!id || !login) return;
+
+	cookie.value = 'sessionid = "' + id + '"\r\nsteamLogin = "' + login + '"\r\nsteamparental = ""\r\nsort = ""';
+}
 document.addEventListener('DOMContentLoaded', function() {
+	cookie = document.getElementById("cookie");
+	cookie.onmousedown = function(){
+		cookie.focus();
 
-	getCookies("http://steamcommunity.com", "sessionid", function(id) {
-	    console.log(id);
+	    document.execCommand('SelectAll');
+
+	    document.execCommand("Copy", false, null);
+	}
+
+	getCookies("http://steamcommunity.com", "sessionid", function(value) {
+		id = value;
+		
+		showContent();
 	});
 
-	getCookies("http://steamcommunity.com", "steamLogin", function(login) {
-	    console.log(login);
-	});
-	
+	getCookies("http://steamcommunity.com", "steamLogin", function(value) {
+		login = value;
+		
+		showContent();
+	});	
 });
