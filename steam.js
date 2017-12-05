@@ -1,44 +1,47 @@
-var id, login, cookie;
+var steamcommunityURL = "http://steamcommunity.com";
+var textarea;
 
-function getCookies(domain, name, callback) {
-  chrome.cookies.get({
-    "url": domain,
-    "name": name
-  }, function(cookie) {
-    if (callback) {
-      callback(cookie.value);
-    }
+function getCookies(name) {
+  return new Promise((resolve) => {
+    chrome.cookies.get({
+      "url": steamcommunityURL,
+      "name": name
+    }, function(cookie) {
+      if (cookie) {
+        resolve(cookie.value);
+      } else if (chrome.runtime.lastError) {
+        textarea.value = 'Error: ' + chrome.runtime.lastError.message;
+      } else {
+        resolve('cookie not found');
+      }
+    });
   });
 }
 
-function showContent() {
-  if (!id || !login) return;
-
-  cookie.value = 'sessionid = "' + id + '"\r\nsteamLogin = "' +
-    login + '"\r\nsteamparental = ""\r\nsort = ""';
+function showContent([id, login]) {
+  textarea.value = [
+    `sessionid = "${id}"`,
+    `nsteamLogin = "${login}"`,
+    'nsteamparental = ""',
+    'nsort = ""'
+  ].join('\r\n');
 }
 
 function showCookie() {
-
-  cookie = document.getElementById("cookie");
-  cookie.onmousedown = function() {
-    cookie.focus();
+  textarea = document.getElementById("cookie");
+  textarea.onmousedown = function() {
+    textarea.focus();
 
     document.execCommand('SelectAll');
-
     document.execCommand("Copy", false, null);
   }
+  const promises = [
+    getCookies("sessionid"),
+    getCookies("steamLogin")
+  ];
 
-  getCookies("http://steamcommunity.com", "sessionid", function(value) {
-    id = value;
-
-    showContent();
-  });
-
-  getCookies("http://steamcommunity.com", "steamLogin", function(value) {
-    login = value;
-
-    showContent();
+  Promise.all(promises).then((values) => {
+    showContent(values);
   });
 }
 
@@ -52,7 +55,6 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
 
-    var steamcommunityURL = "http://steamcommunity.com/";
     chrome.tabs.create({
       url: steamcommunityURL
     });
