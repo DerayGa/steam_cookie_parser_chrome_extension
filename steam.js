@@ -21,9 +21,9 @@ function getCookies(name) {
 function showContent([id, login]) {
   textarea.value = [
     `sessionid = "${id}"`,
-    `nsteamLogin = "${login}"`,
-    'nsteamparental = ""',
-    'nsort = ""'
+    `steamLogin = "${login}"`,
+    'steamparental = ""',
+    'sort = ""'
   ].join('\r\n');
 }
 
